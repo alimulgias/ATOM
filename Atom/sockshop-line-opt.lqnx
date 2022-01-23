@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Modified by Alim Ul Gias -->
+<lqn-model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" description="Sock shop LINE." name="sock" xsi:noNamespaceSchemaLocation="/usr/local/share/lqns/lqn.xsd">
+   <solver-params comment="Sockshop model" conv_val="1e-05" it_limit="500" print_int="10" underrelax_coeff="0.1"/> <!-- conv_val="1e-06" underrelax_coeff="0.9" -->
+   <processor multiplicity="1" name="P1" scheduling="inf">
+      <task multiplicity="3000" name="T0" scheduling="ref" think-time="7.0">  <!-- reference task t0 -->
+         <entry name="E0" type="NONE"/>
+         <task-activities>
+            <activity bound-to-entry="E0" host-demand-mean="0.00000005" name="AS"/>
+            <activity host-demand-mean="0.00000005" name="AS0">
+               <synch-call calls-mean="1.0" dest="E1"/>
+            </activity>
+            <precedence>
+               <pre>
+                  <activity name="AS"/>
+               </pre>
+               <post>
+                  <activity name="AS0"/>
+               </post>
+            </precedence>
+         </task-activities>
+      </task>
+   </processor>
+   <processor multiplicity="1" name="P2_1" quantum="0.1" replication="1" scheduling="ps"><!-- server1 -->
+      <task multiplicity="24" name="T1" replication="1" scheduling="fcfs">  <!-- edge router -->
+         <fan-out dest="T2" value="1"/>
+         <entry name="E1" type="NONE"/>
+         <task-activities>
+            <activity bound-to-entry="E1" host-demand-mean="0.00000005" name="AS1"/>
+            <activity host-demand-mean="0.0012" name="AS2">
+               <synch-call calls-mean="0.33" dest="E2"/>
+               <synch-call calls-mean="0.17" dest="E3"/>
+               <synch-call calls-mean="0.5" dest="E4"/>
+            </activity>
+            <precedence>
+               <pre>
+                  <activity name="AS1"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0012" name="AS2"/>
+               </post>
+            </precedence>
+            <reply-entry name="E1">
+               <reply-activity name="AS2"/>
+            </reply-entry>
+         </task-activities>
+      </task>
+   </processor>
+   <processor multiplicity="1" name="P2_2" quantum="0.1" replication="1" scheduling="ps">
+      <task multiplicity="21" name="T2" replication="1" scheduling="fcfs"> <!-- front end -->
+         <fan-out dest="T3" value="1"/>
+         <fan-out dest="T4" value="1"/>
+         <fan-in source="T1" value="1"/>
+         <entry name="E2" type="NONE"/>
+         <entry name="E3" type="NONE"/>
+         <entry name="E4" type="NONE"/>
+         <task-activities>
+            <activity bound-to-entry="E2" host-demand-mean="0.00000005" name="AH1"/>
+            <activity host-demand-mean="0.0021" name="AH2" phase="1"/>
+            <activity bound-to-entry="E3" host-demand-mean="0.00000005" name="AH3"/>
+            <activity host-demand-mean="0.0037" name="AH4" phase="1">
+               <synch-call calls-mean="0.5" dest="E8"/>
+               <synch-call calls-mean="0.5" dest="E9"/>
+            </activity>
+            <activity bound-to-entry="E4" host-demand-mean="0.00000005" name="AH5"/>
+            <activity host-demand-mean="0.0051" name="AH6" phase="1">
+               <synch-call calls-mean="0.33" dest="E5"/>
+               <synch-call calls-mean="0.33" dest="E6"/>
+               <synch-call calls-mean="0.33" dest="E7"/>
+            </activity>
+            <precedence>
+               <pre>
+                  <activity name="AH1"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0021" name="AH2"/>
+               </post>
+            </precedence>
+            <precedence>
+               <pre>
+                  <activity name="AH3"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0037" name="AH4"/>
+               </post>
+            </precedence>
+            <precedence>
+               <pre>
+                  <activity name="AH5"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0051" name="AH6"/>
+               </post>
+            </precedence>
+            <reply-entry name="E2">
+               <reply-activity name="AH2"/>
+            </reply-entry>
+            <reply-entry name="E3">
+               <reply-activity name="AH4"/>
+            </reply-entry>
+            <reply-entry name="E4">
+               <reply-activity name="AH6"/>
+            </reply-entry>
+         </task-activities>
+      </task>
+   </processor>
+   <processor multiplicity="1" name="P2_3" quantum="0.1" replication="1" scheduling="ps">
+      <task multiplicity="100" name="T6" replication="1" scheduling="fcfs">  <!-- cartdb -->
+         <fan-in source="T3" value="1"/>
+         <entry name="E11" type="NONE"/>
+         <task-activities>
+            <activity bound-to-entry="E11" host-demand-mean="0.0000000005" name="AH15"/>
+            <activity host-demand-mean="0.0022" name="AH16" phase="1"/>
+            <precedence>
+               <pre>
+                  <activity name="AH15"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0022" name="AH16"/>
+               </post>
+            </precedence>
+            <reply-entry name="E11">
+               <reply-activity name="AH16"/>
+            </reply-entry>
+         </task-activities>
+      </task>
+   </processor>
+   <processor multiplicity="1" name="P3_1" quantum="0.1" replication="1" scheduling="ps"> <!-- server2 -->
+      <task multiplicity="139" name="T3" replication="1" scheduling="fcfs"> <!-- cart -->
+         <fan-out dest="T6" value="1"/>
+         <fan-in source="T2" value="1"/>
+         <entry name="E5" type="NONE"/>
+         <entry name="E6" type="NONE"/>
+         <entry name="E7" type="NONE"/>
+         <task-activities>
+            <activity bound-to-entry="E5" host-demand-mean="0.0000000005" name="AH7"/>
+            <activity host-demand-mean="0.0048" name="AH8" phase="1">
+               <synch-call calls-mean="1" dest="E11"/>
+            </activity>
+            <activity bound-to-entry="E6" host-demand-mean="0.0000000005" name="AH9"/>
+            <activity host-demand-mean="0.0174" name="AH10" phase="1">
+               <synch-call calls-mean="1" dest="E11"/>
+            </activity>
+            <activity bound-to-entry="E7" host-demand-mean="0.0000000005" name="AH11"/>
+            <activity host-demand-mean="0.0056" name="AH12" phase="1">
+               <synch-call calls-mean="1" dest="E11"/>
+            </activity>
+            <precedence>
+               <pre>
+                  <activity name="AH7"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0048" name="AH8"/>
+               </post>
+            </precedence>
+            <precedence>
+               <pre>
+                  <activity name="AH9"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0174" name="AH10"/>
+               </post>
+            </precedence>
+            <precedence>
+               <pre>
+                  <activity name="AH11"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0056" name="AH12"/>
+               </post>
+            </precedence>
+            <reply-entry name="E5">
+               <reply-activity name="AH8"/>
+            </reply-entry>
+            <reply-entry name="E6">
+               <reply-activity name="AH10"/>
+            </reply-entry>
+            <reply-entry name="E7">
+               <reply-activity name="AH12"/>
+            </reply-entry>
+         </task-activities>
+      </task>
+   </processor>
+   <processor multiplicity="1" name="P3_2" quantum="0.1" replication="1" scheduling="ps">
+      <task multiplicity="16" name="T4" replication="1" scheduling="fcfs"> <!-- catalog -->
+         <fan-out dest="T5" value="1"/>
+         <fan-in source="T2" value="1"/>
+         <entry name="E8" type="NONE"/>
+         <entry name="E9" type="NONE"/>
+         <task-activities>
+            <activity bound-to-entry="E8" host-demand-mean="0.0000000005" name="AS3"/>
+            <activity host-demand-mean="0.0022" name="AS4" phase="1">
+               <synch-call calls-mean="1" dest="E10"/>
+            </activity>
+            <activity bound-to-entry="E9" host-demand-mean="0.0000000005" name="AS5"/>
+            <activity host-demand-mean="0.0019" name="AS6" phase="1">
+               <synch-call calls-mean="1" dest="E10"/>
+            </activity>
+            <precedence>
+               <pre>
+                  <activity name="AS3"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0022" name="AS4"/>
+               </post>
+            </precedence>
+            <precedence>
+               <pre>
+                  <activity name="AS5"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0019" name="AS6"/>
+               </post>
+            </precedence>
+            <reply-entry name="E8">
+               <reply-activity name="AS4"/>
+            </reply-entry>
+            <reply-entry name="E9">
+               <reply-activity name="AS6"/>
+            </reply-entry>
+         </task-activities>
+      </task>
+   </processor>
+   <processor multiplicity="1" name="P3_3" quantum="0.1" replication="1" scheduling="ps">
+      <task multiplicity="151" name="T5" replication="1" scheduling="fcfs">  <!-- catalogdb -->
+         <fan-in source="T4" value="1"/>
+         <entry name="E10" type="NONE"/>
+         <task-activities>
+            <activity bound-to-entry="E10" host-demand-mean="0.0000000005" name="AH13"/>
+            <activity host-demand-mean="0.0013" name="AH14" phase="1"/>
+            <precedence>
+               <pre>
+                  <activity name="AH13"/>
+               </pre>
+               <post>
+                  <activity host-demand-mean="0.0013" name="AH14"/>
+               </post>
+            </precedence>
+            <reply-entry name="E10">
+               <reply-activity name="AH14"/>
+            </reply-entry>
+         </task-activities>
+      </task>
+   </processor>
+</lqn-model>
